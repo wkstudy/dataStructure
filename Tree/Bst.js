@@ -119,13 +119,15 @@ function postOrderTraverseNode(root) {
     console.log(root.key);
   }
 }
+
+//  此处的写法不对，比如删除叶子节点的时候，`node = null`只是删除了这个节点，但是他的父节点的指向就出了问题
 function removeNode (root, key) {
   if (!root) {
     // 没有找到这个key
     return false;
   }else if (key < root.key) {
     return removeNode(root.left, key);
-  }else if (key >= root.key) {
+  }else if (key > root.key) {
     return removeNode(root.right, key); 
   }else {
     // 相等
@@ -154,4 +156,51 @@ function removeMinNode(root) {
   var temp = root;
   root = null;
   return temp;
+}
+
+//  书中的写法
+BinarySearchTree.method('delete', function (key) {
+  root = deleteNode(this.root, key);
+});
+
+function deleteNode (node, key) {
+  if (node == null) {
+    return null;
+  }
+
+  if (key < node.key) {
+    node.left = deleteNode(node.left, key);
+    return node;
+  } else if (key > node.key) {
+    node.right = deleteNode(node.right, key);
+    return node;
+  } else {
+    // 叶子节点
+    if (node.left == null && node.right == null) {
+      node = null;
+      return node;
+    }
+
+    //  只有一个叶子节点
+    if (node.left && node.right == null) {
+      node = node.left;
+      return node;
+    } else if (node.right && node.left == null) {
+      node = node.right;
+      return node;
+    }
+
+    //  两个子节点
+    var aux = findMinVal(node.right);
+    node.val = aux.val;
+    node.right = deleteNode(node.right, aux.key);
+    return node;
+
+  }
+}
+function findMinVal (node) {
+  while (node.left) {
+    node = node.left;
+  }
+  return node;
 }
